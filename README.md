@@ -162,10 +162,5 @@ Pull requests are welcome! If you find a bug or want to add a feature (multi-PDF
 
 ---
 
-## License
 
-MIT License — free to use, modify, and distribute.
-
----
-
-*Built with ❤️ using LangChain, Google Gemini, and a lot of CSS.*
+*Built with ❤️ using LangChain and a lot of CSS.*
