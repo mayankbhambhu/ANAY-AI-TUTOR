@@ -34,7 +34,7 @@
         }
 
         html { height: 100%; scroll-behavior: smooth; }
-
+        
         body {
             font-family: 'DM Mono', monospace;
             background: var(--bg-void);
@@ -108,6 +108,7 @@
             margin-bottom: 32px;
             animation: slideDown 0.8s cubic-bezier(0.16,1,0.3,1) both;
         }
+        
         .logo-group {
             display: flex;
             align-items: baseline;
@@ -152,6 +153,7 @@
             box-shadow: 0 0 10px rgba(74,222,128,0.8);
             animation: pulse-dot 2s ease-in-out infinite;
         }
+        
         @keyframes pulse-dot {
             0%,100% { opacity: 1; transform: scale(1); }
             50% { opacity: 0.6; transform: scale(0.8); }
@@ -668,6 +670,7 @@
     </style>
 </head>
 <body>
+    
 
     <!-- Ambient glows -->
     <div class="ambient ambient-1"></div>
@@ -678,12 +681,15 @@
     <canvas id="cosmos"></canvas>
 
     <div class="shell">
+
         <!-- Header -->
         <header>
+    
             <div class="logo-group">
                 <span class="logo-mark">ANAY</span>
                 <span class="logo-tag">AI Tutor</span>
             </div>
+          
             <div class="status-badge">
                 <span class="status-dot"></span>
                 ONLINE · v1.O
@@ -762,9 +768,10 @@
             <div class="footer-col">
                 <h4>Navigation</h4>
                 <ul>
-                    <li><a href="index.html">Home</a></li>
+                    <li><a href="/Landing.html">Home</a></li>
                     <li><a href="aboutus.html">About Us</a></li>
                     <li><a href="contact.html">Contact</a></li>
+                    <li><a href="/index.html">Study</a></li>
                 </ul>
             </div>
 
