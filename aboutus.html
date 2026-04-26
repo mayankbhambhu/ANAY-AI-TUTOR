@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us — ANAY  </title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg-void: #050810;
+            --bg-deep: #080d1a;
+            --bg-panel: rgba(12, 18, 35, 0.85);
+            --bg-glass: rgba(255,255,255,0.03);
+            --border-dim: rgba(255,255,255,0.07);
+            --border-glow: rgba(94, 195, 255, 0.3);
+            --accent-cyan: #5ec3ff;
+            --accent-gold: #e8c87a;
+            --accent-violet: #a78bfa;
+            --text-primary: #e8eaf2;
+            --text-secondary: #7a8299;
+            --text-muted: #3d4460;
+            --shadow-glow: 0 0 60px rgba(94, 195, 255, 0.08);
+            --radius-lg: 20px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+        }
+
+        html { height: 100%; scroll-behavior: smooth; }
+
+        body {
+            font-family: 'DM Mono', monospace;
+            background: var(--bg-void);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* ── CANVAS ── */
+        #cosmos { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+        /* ── AMBIENT ── */
+        .ambient { position: fixed; border-radius: 50%; filter: blur(120px); pointer-events: none; z-index: 0; }
+        .ambient-1 { width: 600px; height: 600px; background: radial-gradient(circle, rgba(94,195,255,0.06) 0%, transparent 70%); top: -200px; left: -200px; animation: drift1 18s ease-in-out infinite alternate; }
+        .ambient-2 { width: 500px; height: 500px; background: radial-gradient(circle, rgba(167,139,250,0.05) 0%, transparent 70%); bottom: -100px; right: -100px; animation: drift2 22s ease-in-out infinite alternate; }
+        .ambient-3 { width: 400px; height: 400px; background: radial-gradient(circle, rgba(232,200,122,0.04) 0%, transparent 70%); top: 50%; left: 50%; transform: translate(-50%,-50%); animation: drift3 15s ease-in-out infinite alternate; }
+        @keyframes drift1 { to { transform: translate(80px, 60px); } }
+        @keyframes drift2 { to { transform: translate(-60px, -80px); } }
+        @keyframes drift3 { to { transform: translate(-50%, -50%) scale(1.3); } }
+
+        /* ── LAYOUT ── */
+        .page-wrap {
+            position: relative;
+            z-index: 1;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 40px 100px;
+        }
+
+        /* ── HEADER / NAV ── */
+        header {
+            padding: 36px 0 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-dim);
+            margin-bottom: 80px;
+            animation: slideDown 0.8s cubic-bezier(0.16,1,0.3,1) both;
+        }
+        .logo-group { display: flex; align-items: baseline; gap: 14px; text-decoration: none; }
+        .logo-mark {
+            font-family: 'Syne', sans-serif;
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-violet));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .logo-tag {
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            font-weight: 300;
+            letter-spacing: 3px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+        nav { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+        nav a {
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 7px 14px;
+            border-radius: 100px;
+            border: 1px solid transparent;
+            transition: all 0.25s ease;
+        }
+        nav a:hover, nav a.active {
+            color: var(--accent-cyan);
+            border-color: var(--border-glow);
+            background: rgba(94,195,255,0.06);
+        }
+
+        /* ── HERO ── */
+        .about-hero {
+            text-align: center;
+            margin-bottom: 100px;
+            animation: slideUp 1s 0.1s cubic-bezier(0.16,1,0.3,1) both;
+        }
+        .hero-eyebrow {
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--accent-cyan);
+            margin-bottom: 22px;
+            opacity: 0.8;
+        }
+        .about-hero h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(40px, 7vw, 76px);
+            font-weight: 300;
+            line-height: 1.1;
+            letter-spacing: -0.5px;
+            color: var(--text-primary);
+            margin-bottom: 24px;
+        }
+        .about-hero h1 em {
+            font-style: italic;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .about-hero p {
+            font-family: 'DM Mono', monospace;
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.9;
+            max-width: 540px;
+            margin: 0 auto 36px;
+            letter-spacing: 0.3px;
+        }
+        .hero-cta-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+        .btn-primary {
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--bg-void);
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-violet));
+            border: none;
+            padding: 12px 26px;
+            border-radius: 100px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.25s ease;
+            display: inline-block;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(94,195,255,0.25); }
+        .btn-outline {
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            background: transparent;
+            border: 1px solid var(--border-dim);
+            padding: 12px 26px;
+            border-radius: 100px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.25s ease;
+            display: inline-block;
+        }
+        .btn-outline:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); background: rgba(94,195,255,0.05); }
+
+        /* ── STATS ROW ── */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            background: var(--border-dim);
+            border: 1px solid var(--border-dim);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            margin-bottom: 100px;
+            animation: slideUp 1s 0.2s cubic-bezier(0.16,1,0.3,1) both;
+        }
+        .stat-cell {
+            background: var(--bg-panel);
+            backdrop-filter: blur(20px);
+            padding: 40px 32px;
+            text-align: center;
+        }
+        .stat-num {
+            font-family: 'Syne', sans-serif;
+            font-size: 42px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-violet));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+            margin-bottom: 10px;
+        }
+        .stat-label {
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        /* ── SECTION LABEL ── */
+        .section-label {
+            font-family: 'DM Mono', monospace;
+            font-size: 9px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--accent-cyan);
+            margin-bottom: 14px;
+            opacity: 0.7;
+        }
+
+        /* ── MISSION / VISION ── */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 100px;
+            animation: slideUp 1s 0.3s cubic-bezier(0.16,1,0.3,1) both;
+        }
+        .panel {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-dim);
+            border-radius: var(--radius-lg);
+            padding: 40px;
+            backdrop-filter: blur(20px);
+            position: relative;
+            overflow: hidden;
+            transition: border-color 0.3s ease, transform 0.3s ease;
+        }
+        .panel:hover { border-color: var(--border-glow); transform: translateY(-4px); }
+        .panel::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .panel:hover::before { opacity: 0.6; }
+        .panel-icon {
+            width: 44px; height: 44px;
+            border-radius: 12px;
+            border: 1px solid var(--border-dim);
+            background: var(--bg-glass);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            margin-bottom: 22px;
+            color: var(--accent-cyan);
+        }
+        .panel h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 28px;
+            font-weight: 300;
+            color: var(--text-primary);
+            margin-bottom: 14px;
+            line-height: 1.2;
+        }
+        .panel p {
+            font-family: 'DM Mono', monospace;
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.85;
+        }
+
+        /* ── IMPACT SECTION ── */
+        .impact-section {
+            margin-bottom: 100px;
+            animation: slideUp 1s 0.35s cubic-bezier(0.16,1,0.3,1) both;
+        }
+        .impact-section > .section-label { margin-bottom: 14px; }
+        .impact-section > h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(28px, 4vw, 46px);
+            font-weight: 300;
+            margin-bottom: 50px;
+            color: var(--text-primary);
+        }
+        .impact-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+        .impact-card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-dim);
+            border-radius: var(--radius-md);
+            padding: 28px;
+            backdrop-filter: blur(20px);
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            transition: border-color 0.25s, transform 0.25s;
+        }
+        .impact-card:hover { border-color: rgba(232,200,122,0.25); transform: translateY(-3px); }
+        .impact-num {
+            font-family: 'Syne', sans-serif;
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--accent-gold);
+            opacity: 0.4;
+            min-width: 28px;
+        }
+        .impact-text h4 {
+            font-family: 'DM Mono', monospace;
+            font-size: 12px;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+        .impact-text p {
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            color: var(--text-secondary);
+            line-height: 1.75;
+        }
+
+        /* ── TEAM ── */
+        .team-section {
+            margin-bottom: 80px;
+            animation: slideUp 1s 0.4s cubic-bezier(0.16,1,0.3,1) both;
+        }
+        .team-header { margin-bottom: 48px; }
+        .team-header h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(28px, 4vw, 46px);
+            font-weight: 300;
+            color: var(--text-primary);
+        }
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+        }
+        .team-card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-dim);
+            border-radius: var(--radius-lg);
+            padding: 32px 24px;
+            backdrop-filter: blur(20px);
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .team-card:hover { border-color: var(--border-glow); transform: translateY(-6px); box-shadow: 0 20px 50px rgba(0,0,0,0.4), 0 0 30px rgba(94,195,255,0.06); }
+        .team-avatar {
+            width: 64px; height: 64px;
+            border-radius: 18px;
+            margin: 0 auto 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Syne', sans-serif;
+            font-size: 22px;
+            font-weight: 800;
+            position: relative;
+        }
+        .team-avatar::after {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: 19px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-violet));
+            z-index: -1;
+            opacity: 0.3;
+        }
+        .team-card:nth-child(1) .team-avatar { background: rgba(94,195,255,0.1); color: var(--accent-cyan); }
+        .team-card:nth-child(2) .team-avatar { background: rgba(232,200,122,0.1); color: var(--accent-gold); }
+        .team-card:nth-child(3) .team-avatar { background: rgba(167,139,250,0.1); color: var(--accent-violet); }
+        .team-card:nth-child(4) .team-avatar { background: rgba(94,195,255,0.08); color: #7dd3fc; }
+        .team-card:nth-child(5) .team-avatar { background: rgba(232,200,122,0.08); color: #fde68a; }
+        .team-name {
+            font-family: 'Syne', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+        .team-role {
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 14px;
+        }
+        .team-desc {
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* ── FOOTER ── */
+        .site-footer {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            background: rgba(5, 8, 16, 0.85);
+            border-top: 1px solid var(--border-dim);
+            backdrop-filter: blur(30px);
+        }
+        .footer-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 60px 40px 0;
+            display: grid;
+            grid-template-columns: 1.6fr 1fr 1fr 1fr;
+            gap: 48px;
+        }
+        .footer-brand .footer-logo {
+            font-family: 'Syne', sans-serif;
+            font-size: 22px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-violet));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 14px;
+        }
+        .footer-brand p {
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            color: var(--text-secondary);
+            line-height: 1.85;
+            max-width: 220px;
+        }
+        .footer-social-row { display: flex; gap: 10px; margin-top: 24px; }
+        .footer-social-row a {
+            width: 34px; height: 34px;
+            border-radius: 9px;
+            border: 1px solid var(--border-dim);
+            background: var(--bg-glass);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-muted);
+            font-size: 13px;
+            text-decoration: none;
+            transition: all 0.25s ease;
+        }
+        .footer-social-row a:hover {
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+            background: rgba(94,195,255,0.07);
+            box-shadow: 0 0 16px rgba(94,195,255,0.15);
+            transform: translateY(-2px);
+        }
+        .footer-col h4 {
+            font-family: 'DM Mono', monospace;
+            font-size: 9px;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+        .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 11px; }
+        .footer-col ul li a {
+            font-family: 'DM Mono', monospace;
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .footer-col ul li a:hover { color: var(--accent-cyan); }
+        .footer-divider { max-width: 1100px; margin: 50px auto 0; height: 1px; background: var(--border-dim); }
+        .footer-bottom {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 22px 40px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .footer-bottom p { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-muted); letter-spacing: 1px; }
+        .footer-bottom-links { display: flex; gap: 24px; }
+        .footer-bottom-links a { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-muted); text-decoration: none; letter-spacing: 1px; transition: color 0.2s; }
+        .footer-bottom-links a:hover { color: var(--accent-cyan); }
+
+        /* ── ANIMATIONS ── */
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: none; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px) scale(0.98); } to { opacity: 1; transform: none; } }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 860px) {
+            .page-wrap { padding: 0 20px 60px; }
+            .two-col { grid-template-columns: 1fr; }
+            .impact-grid { grid-template-columns: 1fr; }
+            .stats-row { grid-template-columns: 1fr; }
+            nav { gap: 4px; }
+            nav a { font-size: 10px; padding: 6px 10px; }
+            .footer-inner { grid-template-columns: 1fr 1fr; padding: 40px 20px 0; gap: 32px; }
+            .footer-bottom { flex-direction: column; gap: 12px; text-align: center; padding: 20px 20px 24px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ambient ambient-1"></div>
+    <div class="ambient ambient-2"></div>
+    <div class="ambient ambient-3"></div>
+    <canvas id="cosmos"></canvas>
+
+    <div class="page-wrap">
+        <!-- Header -->
+        <header>
+            <a href="index.html" class="logo-group">
+                <span class="logo-mark">ANAY</span>
+                <span class="logo-tag">AI Tutor</span>
+            </a>
+            <nav>
+                <a href="index.html">Home</a>
+                <a href="aboutus.html" class="active">About</a>
+                <a href="contact.html">Contact</a>
+                
+            </nav>
+        </header>
+
+        <!-- Hero -->
+        <section class="about-hero">
+            <p class="hero-eyebrow">// our story</p>
+            <h1>Building the future of<br><em>intelligent learning</em></h1>
+            <p>ANAY was born from a simple belief — that every student deserves access to the kind of deep, expert-level guidance that was once reserved for a privileged few.</p>
+            <div class="hero-cta-row">
+                <a href="#mission" class="btn-primary">Our Mission</a>
+                <a href="#team" class="btn-outline">Meet the Team</a>
+            </div>
+        </section>
+
+        <!-- Stats -->
+        <div class="stats-row">
+            <div class="stat-cell">
+                <div class="stat-num">10K+</div>
+                <div class="stat-label">Students Helped</div>
+            </div>
+            <div class="stat-cell">
+                <div class="stat-num">6</div>
+                <div class="stat-label">Core Subjects</div>
+            </div>
+            <div class="stat-cell">
+                <div class="stat-num">99.2%</div>
+                <div class="stat-label">Satisfaction Rate</div>
+            </div>
+        </div>
+
+        <!-- Mission / Vision -->
+        <section id="mission" class="two-col">
+            <div class="panel">
+                <div class="panel-icon"><i class="fa-solid fa-bullseye"></i></div>
+                <p class="section-label">// mission</p>
+                <h3>Make education intelligent and accessible</h3>
+                <p>We're on a mission to democratize post-doctoral level tutoring. No matter where you are or what you can afford, ANAY brings you the depth of understanding that transforms how you think about any subject.</p>
+            </div>
+            <div class="panel">
+                <div class="panel-icon" style="color:var(--accent-violet)"><i class="fa-solid fa-telescope"></i></div>
+                <p class="section-label">// vision</p>
+                <h3>A world where curiosity is always rewarded</h3>
+                <p>We envision an era where AI bridges the gap between confused learner and confident expert — not by giving answers, but by fostering the kind of deep understanding that lasts a lifetime.</p>
+            </div>
+        </section>
+
+        <!-- Impact -->
+        <section id="impact" class="impact-section">
+            <p class="section-label">// impact</p>
+            <h2>How we help students grow</h2>
+            <div class="impact-grid">
+                <div class="impact-card">
+                    <div class="impact-num">01</div>
+                    <div class="impact-text">
+                        <h4>Personalized depth of explanation</h4>
+                        <p>ANAY adapts its explanations to your current understanding, going deeper or simpler based on how you respond — no more cookie-cutter textbook answers.</p>
+                    </div>
+                </div>
+                <div class="impact-card">
+                    <div class="impact-num">02</div>
+                    <div class="impact-text">
+                        <h4>Cross-disciplinary thinking</h4>
+                        <p>Great thinkers don't stay in their lane. ANAY connects concepts across mathematics, physics, CS, chemistry, and philosophy to build holistic understanding.</p>
+                    </div>
+                </div>
+                <div class="impact-card">
+                    <div class="impact-num">03</div>
+                    <div class="impact-text">
+                        <h4>Instant, 24/7 expert availability</h4>
+                        <p>Stuck at 2 AM before an exam? ANAY is always online, always patient, and always ready to walk you through the hardest concepts at whatever pace you need.</p>
+                    </div>
+                </div>
+                <div class="impact-card">
+                    <div class="impact-num">04</div>
+                    <div class="impact-text">
+                        <h4>Active learning over passive reading</h4>
+                        <p>Through guided questioning and structured dialogue, ANAY turns passive note-taking into active understanding — the kind that actually shows up on exam day.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Team -->
+        <section id="team" class="team-section">
+            <div class="team-header">
+                <p class="section-label">// the people</p>
+                <h2>Meet the team</h2>
+            </div>
+            <div class="team-grid">
+                <div class="team-card">
+                    <div class="team-avatar">AA</div>
+                    <div class="team-name">Anahi Arora</div>
+                    <div class="team-role">Project Leader</div>
+                    <div class="team-desc">Handles architecture and full-stack development.</div>
+                </div>
+                <div class="team-card">
+                    <div class="team-avatar">MB</div>
+                    <div class="team-name">Mayank Bhambhu</div>
+                    <div class="team-role">Project Assistant</div>
+                    <div class="team-desc">Supports development, testing, and integration .</div>
+                </div>
+                
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+     <footer class="site-footer">
+        <div class="footer-inner">
+            <!-- Brand -->
+            <div class="footer-brand">
+                <div class="footer-logo">ANAY</div>
+                <p>Your AI-powered study partner. Post-doctoral tutoring across mathematics, physics, computer science, and beyond.</p>
+                <div class="footer-social-row">
+                     <a href="https://www.instagram.com/bhambhu_mayank?igsh=emoweHYyNmExdWxn" target="_blank" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="https://github.com/aroraanshi180-commits" target="_blank" title="GitHub"><i class="fa-brands fa-github"></i></a>
+                    
+                </div>
+            </div>
+
+            <!-- Quick Links -->
+            <div class="footer-col">
+                <h4>Navigation</h4>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="aboutus.html">About Us</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+
+            <!-- Legal -->
+            <div class="footer-col">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Cookie Policy</a></li>
+                    <li><a href="#">Support</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-divider"></div>
+
+        <div class="footer-bottom">
+            <p>© 2026 ANAY ·  All rights reserved.</p>
+            <div class="footer-bottom-links">
+                <a href="aboutus.html">About</a>
+                <a href="contact.html">Contact</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const canvas = document.getElementById('cosmos');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let W, H;
+
+        function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+        resize();
+        window.addEventListener('resize', resize);
+
+        class Particle {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = Math.random() * W;
+                this.y = Math.random() * H;
+                this.size = Math.random() * 1.4 + 0.3;
+                this.vx = (Math.random() - 0.5) * 0.15;
+                this.vy = (Math.random() - 0.5) * 0.15;
+                this.alpha = Math.random() * 0.5 + 0.1;
+                this.hue = Math.random() > 0.6 ? 200 : (Math.random() > 0.5 ? 45 : 270);
+            }
+            update() {
+                this.x += this.vx; this.y += this.vy;
+                if (this.x < 0 || this.x > W || this.y < 0 || this.y > H) this.reset();
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = `hsla(${this.hue}, 80%, 70%, ${this.alpha})`;
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < 120; i++) particles.push(new Particle());
+
+        function drawConnections() {
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const d = Math.sqrt(dx*dx + dy*dy);
+                    if (d < 90) {
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.strokeStyle = `rgba(94,195,255,${0.04 * (1 - d/90)})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, W, H);
+            drawConnections();
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animate);
+        }
+        animate();
+    </script>
+</body>
+</html>

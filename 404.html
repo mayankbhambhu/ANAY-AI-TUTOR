@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 — Lost in Space · ANAY</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg-void: #050810;
+            --bg-panel: rgba(12, 18, 35, 0.85);
+            --bg-glass: rgba(255,255,255,0.03);
+            --border-dim: rgba(255,255,255,0.07);
+            --border-glow: rgba(94, 195, 255, 0.3);
+            --accent-cyan: #5ec3ff;
+            --accent-gold: #e8c87a;
+            --accent-violet: #a78bfa;
+            --text-primary: #e8eaf2;
+            --text-secondary: #7a8299;
+            --text-muted: #3d4460;
+            --radius-lg: 20px;
+            --radius-md: 12px;
+        }
+
+        html, body { height: 100%; }
+        body {
+            font-family: 'DM Mono', monospace;
+            background: var(--bg-void);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #cosmos { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+        .ambient { position: fixed; border-radius: 50%; filter: blur(120px); pointer-events: none; z-index: 0; }
+        .ambient-1 { width: 700px; height: 700px; background: radial-gradient(circle, rgba(94,195,255,0.07) 0%, transparent 70%); top: -300px; left: -200px; animation: drift1 18s ease-in-out infinite alternate; }
+        .ambient-2 { width: 600px; height: 600px; background: radial-gradient(circle, rgba(167,139,250,0.06) 0%, transparent 70%); bottom: -200px; right: -100px; animation: drift2 22s ease-in-out infinite alternate; }
+        .ambient-3 { width: 500px; height: 500px; background: radial-gradient(circle, rgba(232,200,122,0.04) 0%, transparent 70%); top: 50%; left: 50%; transform: translate(-50%,-50%); animation: drift3 15s ease-in-out infinite alternate; }
+        @keyframes drift1 { to { transform: translate(60px, 40px); } }
+        @keyframes drift2 { to { transform: translate(-40px, -60px); } }
+        @keyframes drift3 { to { transform: translate(-50%, -50%) scale(1.2); } }
+
+        /* ── NAV BAR ── */
+        .nav-bar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 10;
+            padding: 28px 48px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-dim);
+            background: rgba(5,8,16,0.6);
+            backdrop-filter: blur(20px);
+        }
+        .logo-group { display: flex; align-items: baseline; gap: 14px; text-decoration: none; }
+        .logo-mark { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; letter-spacing: -0.5px; background: linear-gradient(135deg, var(--accent-cyan), var(--accent-violet)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .logo-tag { font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 300; letter-spacing: 3px; color: var(--text-muted); text-transform: uppercase; }
+        .nav-links { display: flex; gap: 6px; }
+        .nav-links a { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-secondary); text-decoration: none; padding: 7px 14px; border-radius: 100px; border: 1px solid transparent; transition: all 0.25s ease; }
+        .nav-links a:hover { color: var(--accent-cyan); border-color: var(--border-glow); background: rgba(94,195,255,0.06); }
+
+        /* ── 404 HERO ── */
+        .error-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 0 24px;
+            animation: rise 1.2s cubic-bezier(0.16,1,0.3,1) both;
+        }
+
+        /* Glitch Number */
+        .error-code {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(120px, 22vw, 220px);
+            font-weight: 800;
+            line-height: 1;
+            position: relative;
+            margin-bottom: 8px;
+            user-select: none;
+        }
+        .error-code-inner {
+            background: linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-violet) 50%, var(--accent-gold) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+            display: inline-block;
+        }
+        .error-code-inner::before,
+        .error-code-inner::after {
+            content: '404';
+            position: absolute;
+            top: 0; left: 0;
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+        .error-code-inner::before {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-violet));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: rgba(94,195,255,0.4);
+            animation: glitch1 3.5s ease-in-out infinite;
+        }
+        .error-code-inner::after {
+            background: linear-gradient(135deg, var(--accent-gold), var(--accent-violet));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: rgba(232,200,122,0.3);
+            animation: glitch2 3.5s ease-in-out infinite;
+        }
+        @keyframes glitch1 {
+            0%,90%,100% { transform: none; clip-path: none; }
+            91% { transform: translate(-4px, 2px); clip-path: polygon(0 30%, 100% 30%, 100% 50%, 0 50%); }
+            93% { transform: translate(4px, -2px); clip-path: polygon(0 60%, 100% 60%, 100% 80%, 0 80%); }
+            95% { transform: translate(-2px, 0); clip-path: polygon(0 10%, 100% 10%, 100% 25%, 0 25%); }
+        }
+        @keyframes glitch2 {
+            0%,90%,100% { transform: none; clip-path: none; }
+            91% { transform: translate(4px, -2px); clip-path: polygon(0 55%, 100% 55%, 100% 75%, 0 75%); }
+            93% { transform: translate(-3px, 2px); clip-path: polygon(0 20%, 100% 20%, 100% 40%, 0 40%); }
+            95% { transform: translate(2px, 0); clip-path: polygon(0 70%, 100% 70%, 100% 90%, 0 90%); }
+        }
+
+        /* Orbit ring */
+        .orbit-ring {
+            width: clamp(260px, 40vw, 360px);
+            height: clamp(260px, 40vw, 360px);
+            border: 1px solid rgba(94,195,255,0.08);
+            border-radius: 50%;
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            animation: spin 14s linear infinite;
+            pointer-events: none;
+        }
+        .orbit-ring::before {
+            content: '';
+            position: absolute;
+            top: -4px; left: 50%;
+            width: 8px; height: 8px;
+            background: var(--accent-cyan);
+            border-radius: 50%;
+            box-shadow: 0 0 16px var(--accent-cyan);
+            transform: translateX(-50%);
+        }
+        .orbit-ring-2 {
+            width: clamp(320px, 50vw, 460px);
+            height: clamp(320px, 50vw, 460px);
+            border-color: rgba(167,139,250,0.05);
+            animation: spin 20s linear infinite reverse;
+        }
+        .orbit-ring-2::before { background: var(--accent-violet); box-shadow: 0 0 16px var(--accent-violet); }
+        @keyframes spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
+
+        .orbit-wrap {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 0; height: 0;
+            z-index: -1;
+        }
+
+        /* Text */
+        .error-label {
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--accent-cyan);
+            margin-bottom: 16px;
+            opacity: 0.7;
+        }
+        .error-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(22px, 3.5vw, 38px);
+            font-weight: 300;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            line-height: 1.2;
+        }
+        .error-title em { font-style: italic; color: var(--accent-gold); }
+        .error-body {
+            font-family: 'DM Mono', monospace;
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.85;
+            max-width: 420px;
+            margin: 0 auto 40px;
+        }
+
+        /* CTA Row */
+        .cta-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-bottom: 60px; }
+        .btn-primary {
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--bg-void);
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-violet));
+            border: none;
+            padding: 13px 28px;
+            border-radius: 100px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.25s ease;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(94,195,255,0.25); }
+        .btn-outline {
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            background: transparent;
+            border: 1px solid var(--border-dim);
+            padding: 13px 28px;
+            border-radius: 100px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.25s ease;
+        }
+        .btn-outline:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); background: rgba(94,195,255,0.05); }
+
+        /* Quick links */
+        .quick-links {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .quick-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            color: var(--text-muted);
+            text-decoration: none;
+            letter-spacing: 0.5px;
+            transition: color 0.2s;
+        }
+        .quick-link:hover { color: var(--accent-cyan); }
+        .quick-link i { font-size: 10px; }
+
+        /* ── ANIMATIONS ── */
+        @keyframes rise {
+            from { opacity: 0; transform: translateY(40px) scale(0.96); }
+            to { opacity: 1; transform: none; }
+        }
+
+        @media (max-width: 600px) {
+            .nav-bar { padding: 18px 20px; }
+            .nav-links a { font-size: 10px; padding: 5px 10px; }
+            .logo-tag { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ambient ambient-1"></div>
+    <div class="ambient ambient-2"></div>
+    <div class="ambient ambient-3"></div>
+    <canvas id="cosmos"></canvas>
+
+    <!-- Nav -->
+    <nav class="nav-bar">
+        <a href="index.html" class="logo-group">
+            <span class="logo-mark">ANAY</span>
+            <span class="logo-tag">AI Tutor</span>
+        </a>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="aboutus.html">About</a>
+            <a href="contact.html">Contact</a>
+        </div>
+    </nav>
+
+    <!-- Orbit decoration -->
+    <div class="orbit-wrap">
+        <div class="orbit-ring"></div>
+        <div class="orbit-ring orbit-ring-2"></div>
+    </div>
+
+    <!-- Error content -->
+    <div class="error-content">
+        <div class="error-label">// signal lost</div>
+
+        <div class="error-code">
+            <span class="error-code-inner">404</span>
+        </div>
+
+        <div class="error-title">You've drifted into <em>deep space</em></div>
+        <p class="error-body">
+            The page you're looking for doesn't exist or may have been moved. Even the best navigators get lost sometimes — let us guide you back.
+        </p>
+
+        <div class="cta-row">
+            <a href="index.html" class="btn-primary">← Back to Home</a>
+            <a href="contact.html" class="btn-outline">Report an Issue</a>
+        </div>
+
+        <div class="quick-links">
+            <a href="index.html" class="quick-link"><i class="fa-solid fa-comment"></i> Chat with ANAY</a>
+            <a href="aboutus.html" class="quick-link"><i class="fa-solid fa-users"></i> About Us</a>
+            <a href="contact.html" class="quick-link"><i class="fa-solid fa-envelope"></i> Contact</a>
+            
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('cosmos');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let W, H;
+        function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+        resize();
+        window.addEventListener('resize', resize);
+        class Particle {
+            constructor() { this.reset(); }
+            reset() { this.x = Math.random()*W; this.y = Math.random()*H; this.size = Math.random()*1.6+0.3; this.vx = (Math.random()-0.5)*0.12; this.vy = (Math.random()-0.5)*0.12; this.alpha = Math.random()*0.6+0.1; this.hue = Math.random()>0.6?200:(Math.random()>0.5?45:270); }
+            update() { this.x+=this.vx; this.y+=this.vy; if(this.x<0||this.x>W||this.y<0||this.y>H) this.reset(); }
+            draw() { ctx.beginPath(); ctx.arc(this.x,this.y,this.size,0,Math.PI*2); ctx.fillStyle=`hsla(${this.hue},80%,70%,${this.alpha})`; ctx.fill(); }
+        }
+        for(let i=0;i<160;i++) particles.push(new Particle());
+        function drawConnections() {
+            for(let i=0;i<particles.length;i++) for(let j=i+1;j<particles.length;j++) {
+                const dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y, d=Math.sqrt(dx*dx+dy*dy);
+                if(d<80){ ctx.beginPath(); ctx.moveTo(particles[i].x,particles[i].y); ctx.lineTo(particles[j].x,particles[j].y); ctx.strokeStyle=`rgba(94,195,255,${0.05*(1-d/80)})`; ctx.lineWidth=0.4; ctx.stroke(); }
+            }
+        }
+        function animate() { ctx.clearRect(0,0,W,H); drawConnections(); particles.forEach(p=>{p.update();p.draw();}); requestAnimationFrame(animate); }
+        animate();
+    </script>
+</body>
+</html>

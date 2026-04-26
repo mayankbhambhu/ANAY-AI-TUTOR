@@ -1,0 +1,7 @@
+python3 -m venv venv/// to create virtual enviorment 
+source venv/bin/activate // To activate virtual enviorment
+python3 ingest.py
+pip install streamlit langchain langchain-google-genai langchain-community chromadb pypdf python-dotenv // To Install the AI Libraries
+pip install fastapi uvicorn// To Install the Backend tools
+lsof -ti:8000 | xargs kill -9
+uvicorn api:app --reload --reload-exclude "venv" // To make HTML live

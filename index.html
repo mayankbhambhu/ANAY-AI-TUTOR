@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ANAY — AI Tutor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg-void: #050810;
+            --bg-deep: #080d1a;
+            --bg-panel: rgba(12, 18, 35, 0.85);
+            --bg-glass: rgba(255,255,255,0.03);
+            --border-dim: rgba(255,255,255,0.07);
+            --border-glow: rgba(94, 195, 255, 0.3);
+            --accent-cyan: #5ec3ff;
+            --accent-gold: #e8c87a;
+            --accent-violet: #a78bfa;
+            --text-primary: #e8eaf2;
+            --text-secondary: #7a8299;
+            --text-muted: #3d4460;
+            --user-bg: rgba(94, 195, 255, 0.07);
+            --user-border: rgba(94, 195, 255, 0.2);
+            --bot-bg: rgba(232, 200, 122, 0.06);
+            --bot-border: rgba(232, 200, 122, 0.18);
+            --shadow-glow: 0 0 60px rgba(94, 195, 255, 0.08);
+            --radius-lg: 20px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+        }
+
+        html { height: 100%; scroll-behavior: smooth; }
+
+        body {
+            font-family: 'DM Mono', monospace;
+            background: var(--bg-void);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* ═══════════════════════════ CANVAS BACKGROUND ═══════════════════════════ */
+        #cosmos {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* ═══════════════════════════ AMBIENT GLOWS ═══════════════════════════ */
+        .ambient {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(120px);
+            pointer-events: none;
+            z-index: 0;
+        }
+        .ambient-1 {
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(94,195,255,0.06) 0%, transparent 70%);
+            top: -200px; left: -200px;
+            animation: drift1 18s ease-in-out infinite alternate;
+        }
+        .ambient-2 {
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(167,139,250,0.05) 0%, transparent 70%);
+            bottom: -100px; right: -100px;
+            animation: drift2 22s ease-in-out infinite alternate;
+        }
+        .ambient-3 {
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(232,200,122,0.04) 0%, transparent 70%);
+            top: 50%; left: 50%; transform: translate(-50%,-50%);
+            animation: drift3 15s ease-in-out infinite alternate;
+        }
+        @keyframes drift1 { to { transform: translate(80px, 60px); } }
+        @keyframes drift2 { to { transform: translate(-60px, -80px); } }
+        @keyframes drift3 { to { transform: translate(-50%, -50%) scale(1.3); } }
+
+        /* ═══════════════════════════ LAYOUT ═══════════════════════════ */
+        .shell {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 860px;
+            min-height: 100vh;
+            padding: 0 20px 40px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ═══════════════════════════ HEADER ═══════════════════════════ */
+        header {
+            padding: 36px 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-dim);
+            margin-bottom: 32px;
+            animation: slideDown 0.8s cubic-bezier(0.16,1,0.3,1) both;
+        }
+        .logo-group {
+            display: flex;
+            align-items: baseline;
+            gap: 14px;
+        }
+        .logo-mark {
+            font-family: 'Syne', sans-serif;
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-violet));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .logo-tag {
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            font-weight: 300;
+            letter-spacing: 3px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            color: var(--text-secondary);
+            letter-spacing: 1px;
+            padding: 7px 14px;
+            border: 1px solid var(--border-dim);
+            border-radius: 100px;
+            background: var(--bg-glass);
+            backdrop-filter: blur(10px);
+        }
+        .status-dot {
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: #4ade80;
+            box-shadow: 0 0 10px rgba(74,222,128,0.8);
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+        @keyframes pulse-dot {
+            0%,100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(0.8); }
+        }
+
+        /* ═══════════════════════════ SUBJECT PILLS ═══════════════════════════ */
+        .subjects {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            animation: slideDown 0.9s 0.1s cubic-bezier(0.16,1,0.3,1) both;
+        }
+        .pill {
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 6px 14px;
+            border-radius: 100px;
+            border: 1px solid var(--border-dim);
+            color: var(--text-muted);
+            background: var(--bg-glass);
+            cursor: pointer;
+            transition: all 0.25s ease;
+            white-space: nowrap;
+        }
+        .pill:hover, .pill.active {
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+            background: rgba(94,195,255,0.06);
+            box-shadow: 0 0 20px rgba(94,195,255,0.12);
+        }
+
+        /* ═══════════════════════════ CHAT WINDOW ═══════════════════════════ */
+        .chat-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid var(--border-dim);
+            border-radius: var(--radius-lg);
+            background: var(--bg-panel);
+            backdrop-filter: blur(30px);
+            box-shadow: var(--shadow-glow), 0 40px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+            overflow: hidden;
+            animation: slideUp 1s 0.2s cubic-bezier(0.16,1,0.3,1) both;
+            min-height: 520px;
+        }
+
+        /* Scan-line shimmer */
+        .chat-wrapper::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-cyan), var(--accent-violet), transparent);
+            opacity: 0.6;
+        }
+
+        #history {
+            flex: 1;
+            padding: 32px 28px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            scroll-behavior: smooth;
+            max-height: 500px;
+        }
+
+        #history::-webkit-scrollbar { width: 4px; }
+        #history::-webkit-scrollbar-track { background: transparent; }
+        #history::-webkit-scrollbar-thumb {
+            background: var(--border-dim);
+            border-radius: 10px;
+        }
+        #history::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+        /* ═══════════════════════════ WELCOME STATE ═══════════════════════════ */
+        .welcome {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            padding: 60px 20px;
+            text-align: center;
+            opacity: 1;
+            transition: opacity 0.4s ease;
+        }
+        .welcome-glyph {
+            width: 72px; height: 72px;
+            margin-bottom: 28px;
+            position: relative;
+        }
+        .welcome-glyph svg {
+            width: 100%; height: 100%;
+            animation: rotate-glyph 20s linear infinite;
+        }
+        @keyframes rotate-glyph { to { transform: rotate(360deg); } }
+        .welcome h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(24px, 4vw, 36px);
+            font-weight: 300;
+            color: var(--text-primary);
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+        .welcome h2 em {
+            font-style: italic;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .welcome p {
+            font-family: 'DM Mono', monospace;
+            font-size: 12px;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            max-width: 340px;
+            line-height: 1.8;
+        }
+        .suggested-qs {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 32px;
+            width: 100%;
+            max-width: 480px;
+        }
+        .sq {
+            background: var(--bg-glass);
+            border: 1px solid var(--border-dim);
+            border-radius: var(--radius-md);
+            padding: 14px 18px;
+            font-family: 'DM Mono', monospace;
+            font-size: 12px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.25s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .sq::after {
+            content: '→';
+            position: absolute;
+            right: 18px;
+            top: 50%;
+            transform: translateY(-50%) translateX(10px);
+            opacity: 0;
+            transition: all 0.25s ease;
+            color: var(--accent-cyan);
+        }
+        .sq:hover {
+            border-color: var(--border-glow);
+            color: var(--text-primary);
+            background: rgba(94,195,255,0.05);
+            padding-right: 42px;
+        }
+        .sq:hover::after { opacity: 1; transform: translateY(-50%) translateX(0); }
+
+        /* ═══════════════════════════ MESSAGES ═══════════════════════════ */
+        .message {
+            display: flex;
+            gap: 14px;
+            animation: msgIn 0.5s cubic-bezier(0.16,1,0.3,1) both;
+        }
+        @keyframes msgIn {
+            from { opacity: 0; transform: translateY(16px) scale(0.97); }
+            to { opacity: 1; transform: none; }
+        }
+        .message.user { flex-direction: row-reverse; }
+
+        .avatar {
+            width: 36px; height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+        }
+        .message.user .avatar {
+            background: linear-gradient(135deg, rgba(94,195,255,0.2), rgba(94,195,255,0.08));
+            border: 1px solid rgba(94,195,255,0.25);
+            color: var(--accent-cyan);
+        }
+        .message.bot .avatar {
+            background: linear-gradient(135deg, rgba(232,200,122,0.2), rgba(232,200,122,0.06));
+            border: 1px solid rgba(232,200,122,0.25);
+            color: var(--accent-gold);
+        }
+
+        .bubble {
+            max-width: 75%;
+            padding: 16px 20px;
+            border-radius: var(--radius-md);
+            font-family: 'DM Mono', monospace;
+            font-size: 13px;
+            line-height: 1.8;
+            position: relative;
+        }
+        .message.user .bubble {
+            background: var(--user-bg);
+            border: 1px solid var(--user-border);
+            border-top-right-radius: 4px;
+            color: #c8e6ff;
+        }
+        .message.bot .bubble {
+            background: var(--bot-bg);
+            border: 1px solid var(--bot-border);
+            border-top-left-radius: 4px;
+            color: var(--text-primary);
+        }
+        .bubble-label {
+            font-size: 9px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            opacity: 0.5;
+        }
+        .message.user .bubble-label { color: var(--accent-cyan); }
+        .message.bot .bubble-label { color: var(--accent-gold); }
+
+        /* ═══════════════════════════ TYPING INDICATOR ═══════════════════════════ */
+        .typing-row {
+            display: flex;
+            gap: 14px;
+            align-items: flex-end;
+        }
+        .typing-bubble {
+            background: var(--bot-bg);
+            border: 1px solid var(--bot-border);
+            border-radius: var(--radius-md);
+            border-top-left-radius: 4px;
+            padding: 18px 22px;
+            display: flex;
+            gap: 7px;
+            align-items: center;
+        }
+        .typing-bubble span {
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: var(--accent-gold);
+            opacity: 0.4;
+            animation: blink 1.2s ease-in-out infinite;
+        }
+        .typing-bubble span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-bubble span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes blink { 0%,100%{opacity:0.2;transform:scale(0.8)} 50%{opacity:1;transform:scale(1.1)} }
+
+        /* ═══════════════════════════ INPUT BAR ═══════════════════════════ */
+        .input-bar {
+            padding: 20px 24px;
+            border-top: 1px solid var(--border-dim);
+            background: rgba(5, 8, 16, 0.6);
+            backdrop-filter: blur(20px);
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+        }
+
+        .input-wrap {
+            flex: 1;
+            position: relative;
+        }
+
+        input#userInput {
+            width: 100%;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border-dim);
+            border-radius: var(--radius-md);
+            padding: 14px 50px 14px 18px;
+            font-family: 'DM Mono', monospace;
+            font-size: 13px;
+            color: var(--text-primary);
+            outline: none;
+            transition: all 0.3s ease;
+            line-height: 1.6;
+            resize: none;
+            caret-color: var(--accent-cyan);
+        }
+        input#userInput::placeholder { color: var(--text-muted); }
+        input#userInput:focus {
+            border-color: var(--border-glow);
+            background: rgba(94,195,255,0.04);
+            box-shadow: 0 0 0 3px rgba(94,195,255,0.08), 0 0 30px rgba(94,195,255,0.06);
+        }
+
+        .char-count {
+            position: absolute;
+            bottom: 10px; right: 14px;
+            font-size: 9px;
+            color: var(--text-muted);
+            font-family: 'DM Mono', monospace;
+            pointer-events: none;
+        }
+
+        button#sendBtn {
+            width: 48px; height: 48px;
+            border-radius: var(--radius-md);
+            border: 1px solid rgba(94,195,255,0.25);
+            background: linear-gradient(135deg, rgba(94,195,255,0.15), rgba(94,195,255,0.05));
+            color: var(--accent-cyan);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s ease;
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+        }
+        button#sendBtn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-violet));
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+        button#sendBtn:hover {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 24px rgba(94,195,255,0.3);
+            transform: translateY(-1px);
+        }
+        button#sendBtn:hover::before { opacity: 0.15; }
+        button#sendBtn:active { transform: translateY(0); }
+        button#sendBtn svg { position: relative; z-index: 1; }
+
+        /* ═══════════════════════════ FOOTER ═══════════════════════════ */
+        .footer-note {
+            text-align: center;
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            color: var(--text-muted);
+            letter-spacing: 1.5px;
+            margin-top: 20px;
+            animation: fadeIn 1.5s 0.5s both;
+        }
+
+        /* ═══════════════════════════ ANIMATIONS ═══════════════════════════ */
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: none; }
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px) scale(0.98); }
+            to { opacity: 1; transform: none; }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* ═══════════════════════════ RESPONSIVE ═══════════════════════════ */
+        @media (max-width: 640px) {
+            .shell { padding: 0 12px 28px; }
+            header { padding: 24px 0 18px; }
+            .logo-mark { font-size: 20px; }
+            .logo-tag { display: none; }
+            .subjects { gap: 8px; }
+            .pill { font-size: 9px; padding: 5px 11px; }
+            #history { padding: 20px 16px; max-height: 400px; }
+            .bubble { max-width: 88%; font-size: 12px; }
+            .input-bar { padding: 14px 16px; }
+            .welcome h2 { font-size: 22px; }
+        }
+        @media (max-width: 380px) {
+            .suggested-qs { display: none; }
+        }
+    /* ═══════════════════════════ FOOTER ═══════════════════════════ */
+    .site-footer {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        margin-top: 80px;
+        background: rgba(5, 8, 16, 0.85);
+        border-top: 1px solid var(--border-dim);
+        backdrop-filter: blur(30px);
+    }
+    .footer-inner {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 60px 40px 0;
+        display: grid;
+        grid-template-columns: 1.6fr 1fr 1fr 1fr;
+        gap: 48px;
+    }
+    .footer-brand .footer-logo {
+        font-family: 'Syne', sans-serif;
+        font-size: 22px;
+        font-weight: 800;
+        background: linear-gradient(135deg, var(--accent-cyan), var(--accent-violet));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 14px;
+        letter-spacing: -0.3px;
+    }
+    .footer-brand p {
+        font-family: 'DM Mono', monospace;
+        font-size: 11px;
+        color: var(--text-secondary);
+        line-height: 1.85;
+        letter-spacing: 0.3px;
+        max-width: 220px;
+    }
+    .footer-social-row {
+        display: flex;
+        gap: 10px;
+        margin-top: 24px;
+    }
+    .footer-social-row a {
+        width: 34px; height: 34px;
+        border-radius: 9px;
+        border: 1px solid var(--border-dim);
+        background: var(--bg-glass);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-muted);
+        font-size: 14px;
+        text-decoration: none;
+        transition: all 0.25s ease;
+    }
+    .footer-social-row a:hover {
+        border-color: var(--accent-cyan);
+        color: var(--accent-cyan);
+        background: rgba(94,195,255,0.07);
+        box-shadow: 0 0 16px rgba(94,195,255,0.15);
+        transform: translateY(-2px);
+    }
+    .footer-col h4 {
+        font-family: 'DM Mono', monospace;
+        font-size: 9px;
+        letter-spacing: 2.5px;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        margin-bottom: 20px;
+    }
+    .footer-col ul {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 11px;
+    }
+    .footer-col ul li a {
+        font-family: 'DM Mono', monospace;
+        font-size: 12px;
+        color: var(--text-secondary);
+        text-decoration: none;
+        letter-spacing: 0.3px;
+        transition: all 0.2s ease;
+        position: relative;
+    }
+    .footer-col ul li a::before {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 0;
+        height: 1px;
+        background: var(--accent-cyan);
+        transition: width 0.25s ease;
+    }
+    .footer-col ul li a:hover { color: var(--accent-cyan); }
+    .footer-col ul li a:hover::before { width: 100%; }
+    .footer-divider {
+        max-width: 1100px;
+        margin: 50px auto 0;
+        height: 1px;
+        background: var(--border-dim);
+    }
+    .footer-bottom {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 22px 40px 28px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .footer-bottom p {
+        font-family: 'DM Mono', monospace;
+        font-size: 10px;
+        color: var(--text-muted);
+        letter-spacing: 1px;
+    }
+    .footer-bottom-links {
+        display: flex;
+        gap: 24px;
+    }
+    .footer-bottom-links a {
+        font-family: 'DM Mono', monospace;
+        font-size: 10px;
+        color: var(--text-muted);
+        text-decoration: none;
+        letter-spacing: 1px;
+        transition: color 0.2s;
+    }
+    .footer-bottom-links a:hover { color: var(--accent-cyan); }
+    @media (max-width: 860px) {
+        .footer-inner { grid-template-columns: 1fr 1fr; padding: 40px 24px 0; gap: 32px; }
+        .footer-bottom { flex-direction: column; gap: 12px; text-align: center; padding: 20px 24px 24px; }
+    }
+    @media (max-width: 480px) {
+        .footer-inner { grid-template-columns: 1fr; }
+    }
+    </style>
+</head>
+<body>
+
+    <!-- Ambient glows -->
+    <div class="ambient ambient-1"></div>
+    <div class="ambient ambient-2"></div>
+    <div class="ambient ambient-3"></div>
+
+    <!-- Particle canvas -->
+    <canvas id="cosmos"></canvas>
+
+    <div class="shell">
+        <!-- Header -->
+        <header>
+            <div class="logo-group">
+                <span class="logo-mark">ANAY</span>
+                <span class="logo-tag">AI Tutor</span>
+            </div>
+            <div class="status-badge">
+                <span class="status-dot"></span>
+                ONLINE · v1.O
+            </div>
+        </header>
+
+        <!-- Subject Pills -->
+        <div class="subjects">
+            <button class="pill active" onclick="setPill(this,'')">All Fields</button>
+            <button class="pill" onclick="setPill(this,'Explain this concept in Physics: ')">Physics</button>
+            <button class="pill" onclick="setPill(this,'Solve this Math problem: ')">Mathematics</button>
+            <button class="pill" onclick="setPill(this,'Explain this in Computer Science: ')">CS Theory</button>
+            <button class="pill" onclick="setPill(this,'Explain this Chemistry concept: ')">Chemistry</button>
+            <button class="pill" onclick="setPill(this,'Explain this philosophy: ')">Philosophy</button>
+        </div>
+
+        <!-- Chat Window -->
+        <div class="chat-wrapper" style="position:relative;">
+            <div id="history">
+                <!-- Welcome State -->
+                <div class="welcome" id="welcomeState">
+                    <div class="welcome-glyph">
+                        <svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="36" cy="36" r="34" stroke="rgba(94,195,255,0.15)" stroke-width="1"/>
+                            <circle cx="36" cy="36" r="26" stroke="rgba(94,195,255,0.1)" stroke-width="1" stroke-dasharray="4 4"/>
+                            <circle cx="36" cy="36" r="18" stroke="rgba(232,200,122,0.2)" stroke-width="1"/>
+                            <circle cx="36" cy="36" r="5" fill="rgba(94,195,255,0.4)"/>
+                            <line x1="2" y1="36" x2="70" y2="36" stroke="rgba(94,195,255,0.08)" stroke-width="1"/>
+                            <line x1="36" y1="2" x2="36" y2="70" stroke="rgba(94,195,255,0.08)" stroke-width="1"/>
+                            <circle cx="36" cy="2" r="2" fill="rgba(94,195,255,0.5)"/>
+                            <circle cx="36" cy="70" r="2" fill="rgba(94,195,255,0.5)"/>
+                            <circle cx="2" cy="36" r="2" fill="rgba(232,200,122,0.5)"/>
+                            <circle cx="70" cy="36" r="2" fill="rgba(232,200,122,0.5)"/>
+                        </svg>
+                    </div>
+                    <h2>Where curiosity meets<br><em>deep understanding</em></h2>
+                    <p>Post-doctoral level tutoring across mathematics, physics, computer science, and beyond.</p>
+                    <div class="suggested-qs">
+                        <button class="sq" onclick="prefill('Derive the Schrödinger equation from first principles and explain its physical interpretation')">Derive the Schrödinger equation from first principles →</button>
+                        <button class="sq" onclick="prefill('Explain the P vs NP problem and its implications for cryptography')">Explain P vs NP and implications for cryptography →</button>
+                        <button class="sq" onclick="prefill('What is the geometric intuition behind the Riemann hypothesis?')">What is the geometric intuition behind Riemann hypothesis? →</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Bar -->
+            <div class="input-bar">
+                <div class="input-wrap">
+                    <input type="text" id="userInput" placeholder="Ask anything at any depth…" maxlength="2000" autocomplete="off" onkeydown="handleKey(event)" oninput="updateChar()">
+                    <span class="char-count" id="charCount"></span>
+                </div>
+                <button id="sendBtn" onclick="sendMessage()" title="Send (Enter)">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <!-- Brand -->
+            <div class="footer-brand">
+                <div class="footer-logo">ANAY</div>
+                <p>Your AI-powered study partner. Post-doctoral tutoring across mathematics, physics, computer science, and beyond.</p>
+                <div class="footer-social-row">
+                     <a href="https://www.instagram.com/bhambhu_mayank?igsh=emoweHYyNmExdWxn" target="_blank" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="https://github.com/aroraanshi180-commits" target="_blank" title="GitHub"><i class="fa-brands fa-github"></i></a>
+                    
+                </div>
+            </div>
+
+            <!-- Quick Links -->
+            <div class="footer-col">
+                <h4>Navigation</h4>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="aboutus.html">About Us</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+
+            <!-- Legal -->
+            <div class="footer-col">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Cookie Policy</a></li>
+                    <li><a href="#">Support</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-divider"></div>
+
+        <div class="footer-bottom">
+            <p>© 2026 ANAY ·  All rights reserved.</p>
+            <div class="footer-bottom-links">
+                <a href="aboutus.html">About</a>
+                <a href="contact.html">Contact</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        /* ─── Canvas Particle System ─── */
+        const canvas = document.getElementById('cosmos');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let W, H;
+
+        function resize() {
+            W = canvas.width = window.innerWidth;
+            H = canvas.height = window.innerHeight;
+        }
+        resize();
+        window.addEventListener('resize', resize);
+
+        class Particle {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = Math.random() * W;
+                this.y = Math.random() * H;
+                this.size = Math.random() * 1.4 + 0.3;
+                this.vx = (Math.random() - 0.5) * 0.15;
+                this.vy = (Math.random() - 0.5) * 0.15;
+                this.alpha = Math.random() * 0.5 + 0.1;
+                this.hue = Math.random() > 0.6 ? 200 : (Math.random() > 0.5 ? 45 : 270);
+            }
+            update() {
+                this.x += this.vx; this.y += this.vy;
+                if (this.x < 0 || this.x > W || this.y < 0 || this.y > H) this.reset();
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = `hsla(${this.hue}, 80%, 70%, ${this.alpha})`;
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < 120; i++) particles.push(new Particle());
+
+        function drawConnections() {
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const d = Math.sqrt(dx*dx + dy*dy);
+                    if (d < 90) {
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.strokeStyle = `rgba(94,195,255,${0.04 * (1 - d/90)})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, W, H);
+            drawConnections();
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        /* ─── UI Helpers ─── */
+        let pillPrefix = '';
+
+        function setPill(el, prefix) {
+            document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+            el.classList.add('active');
+            pillPrefix = prefix;
+        }
+
+        function prefill(text) {
+            document.getElementById('userInput').value = text;
+            document.getElementById('userInput').focus();
+            updateChar();
+        }
+
+        function handleKey(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        }
+
+        function updateChar() {
+            const inp = document.getElementById('userInput');
+            const cc = document.getElementById('charCount');
+            cc.textContent = inp.value.length > 100 ? inp.value.length + '/2000' : '';
+        }
+
+        function hideWelcome() {
+            const w = document.getElementById('welcomeState');
+            if (w) { w.style.opacity = '0'; setTimeout(() => w.remove(), 400); }
+        }
+
+        function showTyping() {
+            const history = document.getElementById('history');
+            const row = document.createElement('div');
+            row.className = 'typing-row';
+            row.id = 'typingIndicator';
+            row.innerHTML = `
+                <div class="avatar" style="background:linear-gradient(135deg,rgba(232,200,122,0.2),rgba(232,200,122,0.06));border:1px solid rgba(232,200,122,0.25);color:#e8c87a;">A</div>
+                <div class="typing-bubble"><span></span><span></span><span></span></div>`;
+            history.appendChild(row);
+            history.scrollTop = history.scrollHeight;
+        }
+
+        function removeTyping() {
+            const t = document.getElementById('typingIndicator');
+            if (t) t.remove();
+        }
+
+        function appendMessage(who, text) {
+            const history = document.getElementById('history');
+            const isUser = who === 'user';
+            const div = document.createElement('div');
+            div.className = `message ${who}`;
+            div.innerHTML = `
+                <div class="avatar">${isUser ? 'U' : 'A'}</div>
+                <div class="bubble">
+                    <div class="bubble-label">${isUser ? 'YOU' : 'ANAY'}</div>
+                    ${escapeHTML(text)}
+                </div>`;
+            history.appendChild(div);
+            history.scrollTop = history.scrollHeight;
+        }
+
+        function escapeHTML(str) {
+            return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+        }
+
+        /* ─── Original sendMessage (FastAPI backend preserved) ─── */
+        async function sendMessage() {
+            const inputField = document.getElementById("userInput");
+            const history = document.getElementById("history");
+            const question = pillPrefix + inputField.value.trim();
+
+            if (!question.trim()) return;
+
+            hideWelcome();
+            appendMessage('user', inputField.value.trim());
+            inputField.value = "";
+            updateChar();
+
+            showTyping();
+
+            // Original API call — unchanged
+            const response = await fetch("http://127.0.0.1:8000/ask", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ question: question })
+            });
+
+            removeTyping();
+            const data = await response.json();
+            appendMessage('bot', data.reply);
+        }
+    </script>
+</body>
+</html>
