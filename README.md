@@ -1,166 +1,183 @@
-# ANAY — Personalized AI Tutor
+# ANAY — AI Tutor Platform
 
-> Post-doctoral level tutoring powered by your own documents, Google Gemini, and a beautiful dark-mode UI.
+> Your AI-powered study partner. Ask anything, go deep, understand completely.
 
-![ANAY Preview](https://img.shields.io/badge/AI-Gemini%202.5%20Flash-blue?style=flat-square) ![Stack](https://img.shields.io/badge/Stack-FastAPI%20%7C%20LangChain%20%7C%20ChromaDB-purple?style=flat-square) ![Frontend](https://img.shields.io/badge/Frontend-Vanilla%20HTML%2FJS-cyan?style=flat-square)
-
----
-
-## What is ANAY?
-
-ANAY is a local, privacy-first AI tutor that answers questions based on **your own PDFs**. It uses Retrieval-Augmented Generation (RAG) — meaning it reads your documents, stores them in a local vector database, and gives accurate, context-aware answers powered by Google Gemini.
-
-**All sessions are private. No data leaves your machine except the API call to Gemini.**
+ANAY is a RAG-based (Retrieval-Augmented Generation) AI tutoring platform that lets you upload your own course material and chat with it. Ask questions naturally, get adaptive explanations, and follow the thread until you actually understand — not just recognise — the answer.
 
 ---
 
-## Features
+## What it does
 
-- 🌌 **Stunning cosmic UI** — animated particle canvas, glassmorphism panels, dark mode
-- 📄 **RAG pipeline** — answers grounded in your uploaded documents
-- ⚡ **Two interfaces** — a polished HTML frontend (via FastAPI) and a quick Streamlit app
-- 🧠 **Gemini 2.5 Flash** — fast, capable LLM for Q&A
-- 🗄️ **ChromaDB** — fully local vector store, no cloud needed
-- 🔒 **Privacy first** — your PDFs never leave your machine
+- **RAG-powered Q&A** — your PDF documents are chunked, embedded, and stored in a local Chroma vector database. Every question retrieves the most relevant context before the LLM responds, keeping answers grounded in your material.
+- **Gemini backend** — uses `gemini-2.5-flash` for generation and `gemini-embedding-001` for embeddings via Google's Generative AI API.
+- **FastAPI server** — a lightweight REST API (`POST /ask`) bridges the HTML frontend to the LangChain inference chain.
+- **Static frontend** — a fully self-contained multi-page site (Landing, Chat, About, Contact, 404) with no framework dependencies.
 
 ---
 
-## Project Structure
+## Project structure
 
 ```
-anay-ai-tutor/
-│
-├── index.html      # Main frontend UI (served via FastAPI or opened directly)
-├── api.py          # FastAPI backend — serves /ask endpoint for the HTML frontend
-├── app.py          # Streamlit app — alternative chat interface
-├── ingest.py       # One-time script: reads your PDF and builds the vector DB
-│
-├── document.pdf    # ← YOUR PDF goes here (not committed to git)
-├── .env            # ← Your API key goes here (not committed to git)
-├── chroma_db/      # ← Auto-generated vector database (not committed to git)
-│
-├── requirements.txt
-└── README.md
+.
+├── api.py          # FastAPI server — exposes POST /ask endpoint
+├── ingest.py       # One-time script to build the Chroma vector DB from a PDF
+├── document.pdf    # Your source material (not committed — add your own)
+├── chroma_db/      # Auto-generated vector store (gitignored)
+├── Landing.html    # Marketing / home page
+├── index.html      # Chat interface
+├── aboutus.html    # About page
+├── contact.html    # Contact page
+├── 404.html        # 404 error page
+└── .env            # API keys (not committed — see setup below)
 ```
 
 ---
 
-## Quickstart
+## Prerequisites
+
+- Python 3.9+
+- A [Google AI Studio](https://aistudio.google.com/) API key with access to Gemini models
+- Your course material as a PDF named `document.pdf`
+
+---
+
+## Setup
 
 ### 1. Clone the repo
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/anay-ai-tutor.git
-cd anay-ai-tutor
+git clone https://github.com/your-username/anay.git
+cd anay
 ```
 
 ### 2. Create and activate a virtual environment
 
 ```bash
 python3 -m venv venv
-source venv/bin/activate        # macOS/Linux
+source venv/bin/activate        # macOS / Linux
 # venv\Scripts\activate         # Windows
 ```
 
 ### 3. Install dependencies
 
 ```bash
-pip install -r requirements.txt
+# AI / RAG libraries
+pip install streamlit langchain langchain-google-genai langchain-community chromadb pypdf python-dotenv
+
+# Backend server
+pip install fastapi uvicorn
 ```
 
-### 4. Add your Google Gemini API key
+### 4. Add your API key
 
 Create a `.env` file in the project root:
 
 ```
-GOOGLE_API_KEY=your_api_key_here
+GOOGLE_API_KEY=your_google_api_key_here
 ```
-
-> Get a free API key at [https://aistudio.google.com](https://aistudio.google.com)
 
 ### 5. Add your PDF
 
-Place your document in the project root and name it `document.pdf`.
+Place your course material at the project root as `document.pdf`.
 
-### 6. Ingest the PDF (builds the vector database)
+### 6. Build the vector database
+
+This only needs to be run once (or whenever your PDF changes):
 
 ```bash
-python ingest.py
+python3 ingest.py
 ```
 
-You only need to do this **once** (or whenever you change your PDF).
+This creates a `chroma_db/` folder containing the embedded document chunks.
+
+### 7. Start the API server
+
+```bash
+uvicorn api:app --reload --reload-exclude "venv"
+```
+
+The server runs at `http://localhost:8000`. To kill any process already occupying port 8000:
+
+```bash
+lsof -ti:8000 | xargs kill -9
+```
+
+### 8. Open the frontend
+
+Open `Landing.html` in your browser, or serve the HTML files with any static file server. The chat page (`index.html`) sends requests to `http://localhost:8000/ask`.
 
 ---
 
-## Running the App
+## How it works
 
-### Option A — HTML Frontend + FastAPI (Recommended)
-
-```bash
-uvicorn api:app --reload
+```
+User question
+      │
+      ▼
+  FastAPI /ask
+      │
+      ▼
+  Chroma retriever  ──►  top-3 relevant chunks from your PDF
+      │
+      ▼
+  Gemini 2.5 Flash  ──►  answer grounded in retrieved context
+      │
+      ▼
+  JSON response  ──►  rendered in the chat UI
 ```
 
-Then open `index.html` directly in your browser. The frontend will talk to the FastAPI server at `http://127.0.0.1:8000`.
-
-### Option B — Streamlit Interface
-
-```bash
-streamlit run app.py
-```
-
-Opens automatically at `http://localhost:8501`.
+The prompt keeps things focused: the model acts as a direct tutor, answers from the provided context, and doesn't pad responses with unnecessary caveats.
 
 ---
 
-## How It Works
+## API reference
 
+### `POST /ask`
+
+**Request body**
+```json
+{ "question": "What is an eigenvector?" }
 ```
-Your PDF
-   ↓
-ingest.py  →  Splits into chunks  →  Embeds with Gemini  →  Stores in ChromaDB
-                                                                      ↓
-User Question  →  api.py / app.py  →  Retrieves top 3 chunks  →  Gemini LLM  →  Answer
+
+**Response**
+```json
+{ "reply": "An eigenvector is a vector that..." }
 ```
 
 ---
 
-## Tech Stack
+## Gitignore recommendations
+
+Add these to your `.gitignore`:
+
+```
+.env
+chroma_db/
+venv/
+document.pdf
+__pycache__/
+*.pyc
+```
+
+---
+
+## Tech stack
 
 | Layer | Technology |
 |---|---|
 | LLM | Google Gemini 2.5 Flash |
-| Embeddings | Google Gemini Embedding-001 |
-| Vector Store | ChromaDB (local) |
-| RAG Framework | LangChain |
-| Backend API | FastAPI + Uvicorn |
-| Alt Interface | Streamlit |
-| Frontend | Vanilla HTML / CSS / JS |
-
----
-
-## Requirements
-
-See `requirements.txt`. Key packages:
-
-```
-streamlit
-langchain
-langchain-google-genai
-langchain-community
-chromadb
-pypdf
-python-dotenv
-fastapi
-uvicorn
-```
+| Embeddings | Google `gemini-embedding-001` |
+| Vector store | ChromaDB (local) |
+| RAG framework | LangChain |
+| Backend | FastAPI + Uvicorn |
+| Frontend | Vanilla HTML/CSS/JS |
 
 ---
 
 ## Contributing
 
-Pull requests are welcome! If you find a bug or want to add a feature (multi-PDF support, authentication, streaming responses), feel free to open an issue.
+Pull requests are welcome. For significant changes, please open an issue first to discuss what you'd like to change.
 
 ---
 
 
-*Built with ❤️ using LangChain and a lot of CSS.*
